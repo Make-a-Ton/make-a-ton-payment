@@ -3,10 +3,10 @@ import subprocess
 
 
 def run():
-    pathlib.Path("static").mkdir(exist_ok=True, parents=True)
-    subprocess.Popen("python -m venv venv", cwd=".").wait()
+    pathlib.Path("../static").mkdir(exist_ok=True, parents=True)
+    subprocess.Popen("python -m venv venv", cwd="../").wait()
     subprocess.Popen(". venv/bin/activate && "
-                     "pip install -r requirements.txt", cwd=".").wait()
+                     "pip install -r requirements.txt", cwd="../").wait()
 
     from config.variables import set_up
 
@@ -21,7 +21,7 @@ def run():
                      f"-e POSTGRES_DB={db['name']} "
                      f"-d postgres").wait()
 
-    subprocess.Popen("alembic upgrade head", cwd=".").wait()
+    subprocess.Popen("alembic upgrade head", cwd="../").wait()
 
 
 if __name__ == "__main__":

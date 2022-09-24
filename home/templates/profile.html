@@ -39,12 +39,20 @@
 
     <div>
         <label for="semester">Semester</label>
-        <input type="text" name="semester" id="semester" value="{{ user.semester }}" required>
+        <select name="semester" id="semester" required>
+            {% for key, value in user.semester_options %}
+                <option value="{{ key }}">{{ value }}</option>
+            {% endfor %}
+        </select>
     </div>
 
     <div>
-        <label for="tshirt">T-Shirt</label>
-        <input type="text" name="tshirt" id="tshirt" value="{{ user.tshirt }}" required>
+        <label for="tshirt">Tshirt Size</label>
+        <select name="tshirt" id="tshirt" required>
+            {% for key, value in user.tshirt_options %}
+                <option value="{{ key }}">{{ value }}</option>
+            {% endfor %}
+        </select>
     </div>
 
     <div>
@@ -59,16 +67,24 @@
 
     <div>
         <label for="first_hackathon">Is this your first hackathon ?</label>
-        <input type="checkbox" name="first_hackathon" id="first_hackathon" value="{{ user.first_hackathon }}" required>
+        <input type="checkbox" name="first_hackathon" id="first_hackathon"
+               {% if user.first_hackathon %} checked {% endif %}>
     </div>
 
-    <div {% if user.first_hackathon %} hidden {% endif %}>
+    <div {% if user.first_hackathon %} hidden {% endif %} id="experience_container">
         <label for="experience">Experience</label>
-        <input type="text" name="experience" id="experience" value="{{ user.experience }}">
+        <input type="text" name="experience" id="experience"
+               {% if user.first_hackathon %} value="{{ user.experience }} {% endif %}">
     </div>
 
     <input type="submit" value="Update">
 
 </form>
+<script>
+    const first_hackathon = document.getElementById("first_hackathon");
+    const experience = document.getElementById("experience_container");
+
+    first_hackathon.addEventListener("change", () => experience.hidden = first_hackathon.checked);
+</script>
 </body>
 </html>
