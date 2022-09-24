@@ -83,11 +83,16 @@ async def create_team(user: User = Depends(get_current_user), db: AsyncSession =
     await db.refresh(team)
 
     member_ids = []
+    invalid = set()
 
     for member in members:
         user_m = await get_user_by_email(member, db) or await create_user(member, "", -1, "", db)
-        change = update(User).where(User.id == user_m.id).values(team_id=team.id)
 
+        if user_m.team_id and user_m.team_accepted:
+            invalid.add(member)
+            continue
+
+        change = update(User).where(User.id == user_m.id).values(team_id=team.id, team_accepted=False)
         member_ids.append(user_m.id)
 
         await db.execute(change)
@@ -95,9 +100,12 @@ async def create_team(user: User = Depends(get_current_user), db: AsyncSession =
     change = update(Team).where(Team.id == team.id).values(members=member_ids)
     await db.execute(change)
 
+    change = update(User).where(User.id == user.id).values(team_id=team.id, team_accepted=True)
+    await db.execute(change)
+
     await db.commit()
 
-    send_mails(members, name)
+    send_mails(members-invalid, name)
 
     return RedirectResponse("/registered", status_code=303)
 
@@ -149,10 +157,6 @@ async def delete_team(request: Request, user: User = Depends(get_current_user), 
     if team.lead != user.id:
         context["error"] = "You are not the team lead"
         return templates.TemplateResponse("delete.html", context=context)
-
-    for m in team.members:
-        change = update(User).where(User.id == m).values(team_accepted=False, team_id=None)
-        await db.execute(change)
 
     await db.delete(team)
     await db.commit()

@@ -33,5 +33,6 @@ class User(Base):
     first_hackathon = Column(Boolean, nullable=True)
     experience = Column(String(120), nullable=True)
 
-    team_id = Column(Integer, ForeignKey("team.id"), nullable=True, default=None, server_default=None)
+    team_id = Column(Integer, ForeignKey("team.id", ondelete='SET NULL'), nullable=True, default=None,
+                     server_default=None)
     team_accepted = Column(Boolean, nullable=True, default=False)

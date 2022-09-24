@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from fastapi import HTTPException, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from starlette.responses import JSONResponse, RedirectResponse
@@ -12,7 +13,7 @@ from google.auth.transport import requests
 from starlette.templating import Jinja2Templates
 
 from auth.dependencies import create_access_token, get_user_by_email, create_user
-from auth.models import Token
+from auth.models import Token, User
 from config.db import get_db
 from config.variables import set_up
 
@@ -53,8 +54,6 @@ async def swap_token(request: Request, db: AsyncSession = Depends(get_db)):
     try:
         info = id_token.verify_oauth2_token(auth_code, requests.Request(), config["google"]["id"])
 
-        print(info)
-
         if info['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             raise ValueError('Wrong issuer.')
 
@@ -67,8 +66,16 @@ async def swap_token(request: Request, db: AsyncSession = Depends(get_db)):
     except Exception:
         raise HTTPException(status_code=400, detail="Unable to validate social login")
 
+    user = await get_user_by_email(email, db)
+
     if not await get_user_by_email(email, db):
-        await create_user(email, info.get("name"), -1, info.get("picture"), db)
+        user = await create_user(email, info.get("name"), -1, info.get("picture"), db)
+
+    if not user.phone or not user.name:
+        await db.execute(update(User).where(User.id == user.id)
+                         .values(picture=info.get("picture"), name=info.get("name")))
+
+    await db.commit()
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
