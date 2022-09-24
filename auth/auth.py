@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from fastapi import HTTPException, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
-from google.auth.exceptions import GoogleAuthError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from starlette.responses import JSONResponse, RedirectResponse

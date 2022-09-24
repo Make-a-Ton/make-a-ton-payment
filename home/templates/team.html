@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/home/team.css">
+
+    <title>{{ app }}</title>
+</head>
+<body>
+<form method="post" action="/team/create">
+    <div>
+        <label for="name">Team Name</label>
+        <input type="text" id="name">
+    </div>
+
+    <div>
+        <label for="member1">Member 1</label>
+        <input type="email" id="member1">
+    </div>
+
+    <div>
+        <label for="member2">Member 2</label>
+        <input type="email" id="member2">
+    </div>
+
+    <div>
+        <label for="member3">Member 3</label>
+        <input type="email" id="member3">
+    </div>
+
+    <input type="submit" value="Create">
+
+</form>
+</body>
+</html>

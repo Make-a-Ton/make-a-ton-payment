@@ -80,7 +80,7 @@ async def get_user_by_email(email: str, db: AsyncSession):
     return users.first()
 
 
-async def create_user(email: str, name: str, phone: int, picture: str, db: AsyncSession):
+async def create_user(email: str, name: str, phone: str, picture: str, db: AsyncSession):
     user = User(email=email, name=name, phone=phone, picture=picture)
     db.add(user)
 
@@ -115,10 +115,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
 
     user = await get_user_by_email(email=email, db=db)
 
-    if user is None:
+    if user[0] is None:
         return None
 
-    return user
+    return user[0]
 
 
 def login_redirect(current: str):

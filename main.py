@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
+import home.views
 from auth import auth
-from auth.dependencies import get_current_user, login_redirect
-from auth.models import User
 from config.variables import set_up
 
 app = FastAPI()
@@ -23,15 +22,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
-
 if config['debug']:
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
-@app.get("/")
-def home(current_user: User = Depends(get_current_user)):
-    if not current_user:
-        return login_redirect("/")
-
-    return current_user
+app.include_router(auth.router)
+app.include_router(home.views.router)
