@@ -65,7 +65,7 @@ async def swap_token(request: Request, db: AsyncSession = Depends(get_db)):
         else:
             raise HTTPException(status_code=400, detail="Unable to validate social login")
 
-    except GoogleAuthError:
+    except Exception:
         raise HTTPException(status_code=400, detail="Unable to validate social login")
 
     if not await get_user_by_email(email, db):
