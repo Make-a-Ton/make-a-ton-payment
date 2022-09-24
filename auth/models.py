@@ -21,10 +21,13 @@ class User(Base):
 
     # Extra
 
+    semester_options = [(f"s{i}", f"S{i}") for i in range(1, 11)]
+    tshirt_options = [(s, s.upper()) for s in ["s", "m", "l", "xl", "xxl"]]
+
     college = Column(String(30), nullable=True)
     course = Column(String(30), nullable=True)
-    semester = Column(ChoiceType([(f"s{i}", f"S{i}") for i in range(1, 11)]), nullable=True)
-    tshirt = Column(ChoiceType([(s, s.upper()) for s in ["s", "m", "l", "xl", "xxl"]]), nullable=True)
+    semester = Column(ChoiceType(semester_options), nullable=True)
+    tshirt = Column(ChoiceType(tshirt_options), nullable=True)
     linkedin = Column(URLType, nullable=True)
     github = Column(URLType, nullable=True)
     first_hackathon = Column(Boolean, nullable=True)

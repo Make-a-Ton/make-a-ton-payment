@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="/home/team.css">
+    <link rel="stylesheet" href="/static/home/team.css">
 
     <title>{{ app }}</title>
 </head>
@@ -12,26 +12,35 @@
 <form method="post" action="/team/create">
     <div>
         <label for="name">Team Name</label>
-        <input type="text" id="name">
+        <input type="text" id="name" name="name" required>
     </div>
 
     <div>
-        <label for="member1">Member 1</label>
-        <input type="email" id="member1">
+        <label for="member1">Member 1 Email</label>
+        <input type="email" id="member1" name="member1">
     </div>
 
-    <div>
-        <label for="member2">Member 2</label>
-        <input type="email" id="member2">
+    <div hidden id="container_member2">
+        <label for="member2">Member 2 Email</label>
+        <input type="email" id="member2" name="member2">
     </div>
 
-    <div>
-        <label for="member3">Member 3</label>
-        <input type="email" id="member3">
+    <div hidden id="container_member3">
+        <label for="member3">Member 3 Email</label>
+        <input type="email" id="member3" name="member3">
     </div>
 
     <input type="submit" value="Create">
 
 </form>
+
+<script>
+    for(let i=1; i < 3; i++)
+    {
+        document.getElementById(`member${i}`).addEventListener("keyup", (e) =>
+            document.getElementById(`container_member${i+1}`).hidden = false)
+    }
+</script>
+
 </body>
 </html>

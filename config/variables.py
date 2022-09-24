@@ -18,6 +18,12 @@ def set_up():
             "name": os.getenv("DATABASE_NAME"),
             "port": os.getenv("DATABASE_PORT", 5432),
         },
+        "email": {
+            "user": os.getenv("EMAIL_USER"),
+            "password": os.getenv("EMAIL_PASSWORD"),
+            "host": os.getenv("EMAIL_HOST"),
+            "port": os.getenv("EMAIL_PORT")
+        },
         "secret": os.getenv("APP_SECRET_KEY"),
         "domain": os.getenv("DOMAIN"),
         "protocol": os.getenv("PROTOCOL", "https://"),
@@ -27,5 +33,3 @@ def set_up():
     }
 
     return config
-
-

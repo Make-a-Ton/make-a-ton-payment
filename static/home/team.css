@@ -1,0 +1,6 @@
+form {
+    display: grid;
+    grid-template-columns: 300px;
+    gap: 10px;
+    justify-content: center;
+}
