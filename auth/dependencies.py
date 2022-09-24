@@ -76,16 +76,23 @@ oauth2_scheme = OAuth2PasswordBearerCookie(token_url="/token")
 async def get_user_by_email(email: str, db: AsyncSession):
     query = select(User).where(User.email == email)
     users = await db.execute(query)
+    user = users.first()
 
-    return users.first()
+    if user:
+        return user[0]
+
+    return None
 
 
-async def create_user(email: str, name: str, phone: str, picture: str, db: AsyncSession):
+async def create_user(email: str, name: str, phone: int, picture: str, db: AsyncSession):
     user = User(email=email, name=name, phone=phone, picture=picture)
     db.add(user)
 
     try:
         await db.commit()
+        await db.refresh(user)
+
+        return user
     except Exception:
         await db.rollback()
         raise
@@ -115,15 +122,14 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
 
     user = await get_user_by_email(email=email, db=db)
 
-    if user[0] is None:
+    if user is None:
         return None
 
-    return user[0]
+    return user
 
 
 def login_redirect(current: str):
-    return RedirectResponse(f"/auth/login_google?next_page={current}", status_code=307)
-
+    return RedirectResponse(f"/auth/login_google?next_page={current}", status_code=303)
 
 # class BasicAuth(SecurityBase):
 #     def __init__(self, scheme_name: str = None, auto_error: bool = True):

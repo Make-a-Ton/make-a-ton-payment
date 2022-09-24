@@ -1,8 +1,3 @@
-import smtplib
-import ssl
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
 from fastapi import APIRouter, Depends, Form
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,13 +5,15 @@ from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 from starlette.requests import Request
 
-from auth.dependencies import get_current_user, login_redirect
+from auth.dependencies import get_current_user, login_redirect, create_user, get_user_by_email
 from auth.models import User
 from config.db import get_db
 from config.variables import set_up
+from home.models import Team
+from home.utils import send_mails
 
 templates = Jinja2Templates(directory="home/templates")
-ssl_context = ssl.create_default_context()
+
 router = APIRouter()
 config = set_up()
 
@@ -38,7 +35,7 @@ def profile(request: Request, user=Depends(get_current_user)):
 @router.post("/profile")
 async def create_profile(phone=Form(int), college=Form(str), course=Form(str), semester=Form(str),
                          tshirt=Form(str), linkedin=Form(str), github=Form(str), first_hackathon: bool = Form(False),
-                         experience=Form(str | None), db: AsyncSession = Depends(get_db),
+                         experience: str = Form(None), db: AsyncSession = Depends(get_db),
                          user=Depends(get_current_user)):
     if not user:
         return login_redirect("/profile")
@@ -67,6 +64,103 @@ async def create_profile(phone=Form(int), college=Form(str), course=Form(str), s
     return RedirectResponse("/", status_code=303)
 
 
+@router.post("/team/create")
+async def create_team(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db),
+                      name=Form(str), member1: str = Form(None), member2: str = Form(None), member3: str = Form(None)):
+    if not user:
+        return login_redirect("/")
+
+    members = set([str(m).lower().strip() for m in (member1, member2, member3) if m is not None])
+
+    if len(members) > 3:
+        return RedirectResponse("/?error='Team can have only 4 members'", status_code=307)
+
+    team = Team(name=name, lead=user.id)
+
+    db.add(team)
+    await db.commit()
+
+    await db.refresh(team)
+
+    member_ids = []
+
+    for member in members:
+        user_m = await get_user_by_email(member, db) or await create_user(member, "", -1, "", db)
+        change = update(User).where(User.id == user_m.id).values(team_id=team.id)
+
+        member_ids.append(user_m.id)
+
+        await db.execute(change)
+
+    change = update(Team).where(Team.id == team.id).values(members=member_ids)
+    await db.execute(change)
+
+    await db.commit()
+
+    send_mails(members, name)
+
+    return RedirectResponse("/registered", status_code=303)
+
+
+@router.get("/registered")
+async def registered(request: Request, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    if not user:
+        return login_redirect("/registered")
+
+    if not user.team_id:
+        RedirectResponse("/", status_code=307)
+
+    user.team_accepted = True
+
+    change = update(User).where(User.id == user.id).values(team_accepted=True)
+    await db.execute(change)
+
+    team = await db.get(Team, user.team_id)
+
+    lead = await db.get(User, team.lead)
+    members = [user if m == user.id else await db.get(User, m) for m in team.members if m != lead.id]
+
+    context = {
+        "app": config["name"],
+        "request": request,
+        "name": team.name,
+        "lead": lead.name,
+        "members": members
+    }
+
+    return templates.TemplateResponse("registered.html", context=context)
+
+
+@router.get("/team/delete")
+async def delete_team(request: Request, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    if not user:
+        return login_redirect("/team/delete")
+
+    context = {
+        "request": request
+    }
+
+    if not user.team_id:
+        context["error"] = "You don't have a team"
+        return templates.TemplateResponse("delete.html", context=context)
+
+    team = await db.get(Team, user.team_id)
+
+    if team.lead != user.id:
+        context["error"] = "You are not the team lead"
+        return templates.TemplateResponse("delete.html", context=context)
+
+    for m in team.members:
+        change = update(User).where(User.id == m).values(team_accepted=False, team_id=None)
+        await db.execute(change)
+
+    await db.delete(team)
+    await db.commit()
+
+    context["success"] = True
+    return templates.TemplateResponse("delete.html", context=context)
+
+
 @router.get("/")
 def home(request: Request, user: User = Depends(get_current_user)):
     if not user:
@@ -78,37 +172,11 @@ def home(request: Request, user: User = Depends(get_current_user)):
             (user.first_hackathon and user.experience is None)):
         return RedirectResponse("/profile", status_code=307)
 
+    if user.team_id:
+        return RedirectResponse("/registered", status_code=303)
+
     context = {
         "request": request
     }
 
     return templates.TemplateResponse("team.html", context=context)
-
-
-def create_team(user: User = Depends(get_current_user),
-                name=Form(str), member1=Form(str | None), member2=Form(str | None), member3=Form(str | None)):
-    if not user:
-        return login_redirect("/")
-
-    members = [m for m in (member1, member2, member3) if m is not None]
-
-    with smtplib.SMTP_SSL(config["email"]["host"], config["email"]["port"], context=ssl_context) as server:
-        server.login(config["email"]["user"], config["email"]["password"])
-
-        for member in members:
-            message = MIMEMultipart("alternative")
-            message["Subject"] = "Invite To Make A Ton"
-            message["From"] = config["email"]["user"]
-            message["To"] = member
-
-            context = {
-                "app": config["name"],
-                "team": name
-            }
-
-            html = MIMEText(templates.get_template("email.html").render(context=context), "html")
-            message.attach(html)
-
-            server.sendmail(config["email"]["user"], member, message.as_string())
-
-    return RedirectResponse("/registered", status_code=303)

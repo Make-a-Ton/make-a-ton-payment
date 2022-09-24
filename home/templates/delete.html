@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/static/home/profile.css">
+
+    <title>{{ app }}</title>
+
+</head>
+<body>
+    {% if success %}
+        <h1>Team Deleted</h1>
+    {% else %}
+        <h1>{{ error }}</h1>
+    {% endif %}
+    <a href="/">Go back</a>
+</body>
+</html>

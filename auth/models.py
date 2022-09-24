@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, Boolean, Numeric
+from sqlalchemy import Column, Integer, String, Boolean, Numeric, ForeignKey
 from sqlalchemy_utils import ChoiceType, EmailType, URLType
 
 from config.db import Base
@@ -32,3 +32,6 @@ class User(Base):
     github = Column(URLType, nullable=True)
     first_hackathon = Column(Boolean, nullable=True)
     experience = Column(String(120), nullable=True)
+
+    team_id = Column(Integer, ForeignKey("team.id"), nullable=True, default=None, server_default=None)
+    team_accepted = Column(Boolean, nullable=True, default=False)

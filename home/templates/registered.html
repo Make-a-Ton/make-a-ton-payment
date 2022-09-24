@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/static/home/registered.css">
+
+    <title>{{ app }}</title>
+
+    <style>
+        .button {
+            background-color: coral; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<main>
+    <div class="card-container">
+        <h1>{{ name }}</h1>
+        <h3>Lead: {{ lead }}</h3>
+
+        {% if not members %} <h3>No Members</h3> {% endif %}
+
+        {% if members %}
+            <h3>Members</h3>
+            <table>
+                {% for member in members %}
+                    <tr>
+                        <td>{{ member.email }}</td>
+                        <td> {% if member.name %} {{ member.name }} {% else %} Invitation Pending {% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+        <a href="/team/delete" style="text-decoration: none; color: white">
+            <button class="button">Delete Team</button>
+        </a>
+    </div>
+</main>
+
+</body>
+</html>
