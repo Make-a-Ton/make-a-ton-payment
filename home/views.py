@@ -40,12 +40,6 @@ async def create_profile(phone=Form(int), college=Form(str), course=Form(str), s
     if not user:
         return login_redirect("/profile")
 
-    if first_hackathon:
-        experience = None
-
-    if not first_hackathon and experience is None:
-        return RedirectResponse("/profile?error='First Hackathon'", status_code=307)
-
     change = update(User).where(User.id == user.id).values(
         phone=phone,
         college=college,
@@ -105,7 +99,7 @@ async def create_team(user: User = Depends(get_current_user), db: AsyncSession =
 
     await db.commit()
 
-    send_mails(members-invalid, name)
+    send_mails(members-invalid, name, user.name)
 
     return RedirectResponse("/registered", status_code=303)
 
@@ -132,8 +126,9 @@ async def registered(request: Request, user: User = Depends(get_current_user), d
         "app": config["name"],
         "request": request,
         "name": team.name,
-        "lead": lead.name,
-        "members": members
+        "lead": lead,
+        "members": members,
+        "current_user": user
     }
 
     return templates.TemplateResponse("registered.html", context=context)
@@ -173,7 +168,7 @@ def home(request: Request, user: User = Depends(get_current_user)):
     if not (user.college and user.github and
             user.linkedin and user.course and
             user.tshirt and user.semester and user.phone != -1 and
-            (user.first_hackathon and user.experience is None)):
+             user.experience != None):
         return RedirectResponse("/profile", status_code=307)
 
     if user.team_id:

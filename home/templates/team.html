@@ -5,42 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="/static/home/team.css">
+    <link rel="stylesheet" href="/static/css/app.css">
 
     <title>{{ app }}</title>
 </head>
-<body>
-<form method="post" action="/team/create">
-    <div>
-        <label for="name">Team Name</label>
-        <input type="text" id="name" name="name" required>
+<body class="relative flex flex-col min-h-screen items-center justify-center px-[32px]">
+    <form method="post" action="/team/create" class="max-w-[600px] w-full mx-[32px]">
+        <div class="flex flex-col mb-[10px] h-[100vh] justify-center" id="team">
+            <h1 class="text-3xl md:text-4xl text-white font-bold mb-[32px]">
+                Team Registration
+            </h1>
+            <label for="name" class="font-semibold mb-[10px] text-white text-[20px]">Team Name</label>
+            <input type="text" id="name" name="name" required class="border rounded border-gray-300 py-[7px] px-[15px]">
+            <div class="flex items-center justify-end mt-[10px]">
+                <a
+                  href="#container_member1"
+                  class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+                  >Next</a
+                >
+            </div>
+        </div>
+
+        <div class="flex flex-col mb-[10px] h-[100vh] justify-center" id="container_member1">
+            <label for="member1" class="font-semibold mb-[10px] text-white text-[20px]">Member 1 Email</label>
+            <input type="email" id="member1" name="member1" class="border rounded border-gray-300 py-[7px] px-[15px]">
+            <div class="flex items-center justify-end mt-[10px]">
+                <a
+                href="#team"
+                  class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+                  >Previous</a
+                >
+                <a
+                  href="#container_member2"
+                  class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+                  >Next</a
+                >
+            </div>
+        </div>
+
+        <div hidden id="container_member2" class="flex flex-col mb-[10px] h-[100vh] justify-center">
+            <label for="member2" class="font-semibold mb-[10px] text-white text-[20px]">Member 2 Email</label>
+            <input type="email" id="member2" name="member2" class="border rounded border-gray-300 py-[7px] px-[15px]">
+            <div class="flex items-center justify-end mt-[10px]">
+                <a
+                href="#container_member1"
+                  class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+                  >Previous</a
+                >
+                <a
+                  href="#container_member3"
+                  class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+                  >Next</a
+                >
+            </div>
+        </div>
+
+        <div hidden id="container_member3" class="flex flex-col mb-[10px] h-[100vh] justify-center">
+            <label for="member3" class="font-semibold mb-[10px] text-white text-[20px]">Member 3 Email</label>
+            <input type="email" id="member3" name="member3" class="border rounded border-gray-300 py-[7px] px-[15px]">
+            <div class="flex items-center justify-end mt-[10px]">
+                <a
+                href="#container_member2"
+                  class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+                  >Previous</a
+                >
+                <input 
+                    type="submit" 
+                    value="Create"
+                    class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+                >
+            </div>
+        </div>
+
+        
+    </form>
+    <div class="fixed top-0 h-full w-full left-0 -z-10">
+        <img
+          src="https://makeaton.in/assets/images/hero_bg.png"
+          alt="."
+          class="h-full w-full object-cover object-center"
+        />
     </div>
-
-    <div>
-        <label for="member1">Member 1 Email</label>
-        <input type="email" id="member1" name="member1">
-    </div>
-
-    <div hidden id="container_member2">
-        <label for="member2">Member 2 Email</label>
-        <input type="email" id="member2" name="member2">
-    </div>
-
-    <div hidden id="container_member3">
-        <label for="member3">Member 3 Email</label>
-        <input type="email" id="member3" name="member3">
-    </div>
-
-    <input type="submit" value="Create">
-
-</form>
-
-<script>
+    <div class="fixed top-0 left-0 z-[-1] bg-[#0000009d] h-full w-full"></div>
+<!-- <script>
     for(let i=1; i < 3; i++)
     {
         document.getElementById(`member${i}`).addEventListener("keyup", (e) =>
             document.getElementById(`container_member${i+1}`).hidden = false)
     }
-</script>
+</script> -->
 
 </body>
 </html>

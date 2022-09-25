@@ -14,7 +14,7 @@ templates = Jinja2Templates(directory="home/templates")
 config = set_up()
 
 
-def send_mails(members: Set[str], name):
+def send_mails(members: Set[str], name, inviter):
     with smtplib.SMTP_SSL(config["email"]["host"], config["email"]["port"], context=ssl_context) as server:
         server.login(config["email"]["user"], config["email"]["password"])
 
@@ -27,7 +27,9 @@ def send_mails(members: Set[str], name):
             context = {
                 "app": config["name"],
                 "team": name,
-                "join_url": f"{config['protocol']}{config['domain']}:{config['port']}"
+                "join_url": f"{config['protocol']}{config['domain']}:{config['port']}",
+                "to": member.split("@")[0],
+                "inviter": inviter
             }
 
             html = MIMEText(templates.get_template("email.html").render(**context), "html")

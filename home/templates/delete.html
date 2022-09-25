@@ -5,16 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="/static/home/profile.css">
+    <link rel="stylesheet" href="/static/css/app.css">
 
     <title>{{ app }}</title>
 
 </head>
-<body>
-    {% if success %}
-        <h1>Team Deleted</h1>
-    {% else %}
-        <h1>{{ error }}</h1>
-    {% endif %}
-    <a href="/">Go back</a>
+<body class="relative flex items-center justify-center min-h-screen">
+    <div class="bg-white px-[40px] py-[60px] rounded mx-[32px]">
+        {% if success %}
+            <h1 class="font-bold text-3xl text-center mb-[10px]">Team Deleted</h1>
+        {% else %}
+            <h1 class="font-bold text-3xl text-center mb-[10px]">{{ error }}</h1>
+        {% endif %}
+        <a
+            href="/" 
+            class="py-[10px] px-[20px] mt-[20px] block text-center bg-red-500 text-white font-semibold w-full max-w-[500px] mx-auto rounded"
+        >Go back</a>
+    </div>
+    <div class="fixed top-0 h-full w-full left-0 -z-10">
+        <img
+          src="https://makeaton.in/assets/images/hero_bg.png"
+          alt="."
+          class="h-full w-full object-cover object-center"
+        />
+      </div>
+      <div class="fixed top-0 left-0 z-[-1] bg-[#0000009d] h-full w-full"></div>
+
 </body>
 </html>

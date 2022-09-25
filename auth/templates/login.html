@@ -1,76 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/static/css/app.css" />
 
     <title>Login</title>
 
     <script src="https://accounts.google.com/gsi/client"></script>
 
-    <style>
-        body, html {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-        }
+    <style></style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-[#001d47] via-[#4d0043] to-[#001d58] flex items-center justify-center min-h-screen py-[100px] px-[32px]"
+  >
+    <div class="bg-white py-[60px] px-[40px] rounded shadow">
+      <h1 class="text-center text-[20px] font-semibold mb-[20px]">
+        Login to Make-a-ton 5.0
+      </h1>
+      <p
+        id="error"
+        class="bg-[#eb3131] rounded px-[20px] py-[10px] empty:hidden text-white font-semibold text-[12px] mb-[20px]"
+      ></p>
+      <div id="buttonDiv" class="!w-full"></div>
+    </div>
+    <script>
+      const errorContainer = document.getElementById("error");
 
-        .card-container {
-            padding: 2em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            border-radius: 10px;
-            box-shadow: -1px 1px 20px 0 grey;
-        }
-
-        .card-container h1 {
-            font-family: sans-serif;
-            font-size: 1.8em;
-        }
-    </style>
-</head>
-<body>
-
-<div class="card-container">
-    <h1>Login to {{ app_name }}</h1>
-    <p id="error"></p>
-    <div id="buttonDiv"></div>
-</div>
-<script>
-    const errorContainer = document.getElementById("error");
-
-    function onSignIn(id_token) {
-        fetch('{{ api_location }}{{ swap_token_endpoint }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-Google-OAuth2-Type': 'client'
-            },
-            body: id_token
+      function onSignIn(id_token) {
+        fetch("{{ api_location }}{{ swap_token_endpoint }}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-Google-OAuth2-Type": "client",
+          },
+          body: id_token,
         })
-            .then((r) => r.text())
-            .then(() => location.href = "{{ success_route }}")
-            .catch((e) => errorContainer.innerText = e.message);
-    }
+          .then(async (r) => {
+            if (r.ok) {
+              return (location.href = "{{ success_route }}");
+            }
+            const jsonData = await r.json();
+            return (errorContainer.innerText = jsonData?.detail);
+          })
+          .catch(
+            (e) =>
+              (errorContainer.innerText =
+                "Some error occured while authenticating. Please try again after some time.")
+          );
+      }
 
-
-    google.accounts.id.initialize({
+      google.accounts.id.initialize({
         client_id: "{{ client_id }}",
-        callback: ({credential}) => onSignIn(credential)
-    });
+        callback: ({ credential }) => onSignIn(credential),
+      });
 
-    google.accounts.id.renderButton(
+      google.accounts.id.renderButton(
         document.getElementById("buttonDiv"),
-        {theme: "outline", size: "large"}  // customization attributes
-    );
+        { theme: "outline", size: "large", width: 250 } // customization attributes
+      );
 
-    google.accounts.id.prompt(); // also display the One Tap dialog
-
-</script>
-</body>
+      google.accounts.id.prompt(); // also display the One Tap dialog
+    </script>
+  </body>
 </html>

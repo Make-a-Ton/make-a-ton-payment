@@ -1,90 +1,394 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="/static/home/profile.css">
+    <link rel="stylesheet" href="/static/home/profile.css" />
+    <link rel="stylesheet" href="/static/css/app.css" />
 
     <title>{{ app }}</title>
-</head>
-<body>
-<form method="post" action="/profile">
-    <img src="{{ user.picture }}" alt="dp">
+  </head>
+  <body class="relative flex flex-col min-h-screen items-center justify-center px-[32px]">
+    <form
+      method="post"
+      action="/profile"
+      class="max-w-[600px] w-full mx-[32px]"
+    >
+      <!-- <img
+        src="{{ user.picture }}"
+        alt="dp"
+        class="h-[75px] w-[75px] mx-auto border-4 rounded-full border-gray-500 mb-[30px]"
+      /> -->
 
-    <div>
-        <label for="name">Name</label>
-        <input type="text" id="name" value="{{ user.name }}" readonly>
-    </div>
+      <div class="flex flex-col mb-[10px] h-[100vh] justify-center" id="name">
+        <h1 class="text-3xl md:text-4xl text-white font-bold mb-[32px]">
+          Update profile data
+        </h1>
+        <label for="name" class="font-semibold mb-[10px] text-white text-[20px]"
+          >Name</label
+        >
+        <input
+          type="text"
+          value="{{ user.name }}"
+          readonly
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+        />
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#email"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
 
-    <div>
-        <label for="email">Email</label>
-        <input type="email" id="name" value="{{ user.email }}" readonly>
-    </div>
+      <div class="flex flex-col mb-[10px] h-[100vh] justify-center" id="email">
+        <label
+          for="email"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >Email</label
+        >
+        <input
+          type="email"
+          value="{{ user.email }}"
+          readonly
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+        />
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#name"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#phone"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
 
-    <div>
-        <label for="phone">Phone</label>
-        <input type="tel" name="phone" id="name" value="{{ user.phone }}" required>
-    </div>
+      <div class="flex flex-col mb-[10px] h-[100vh] justify-center" id="phone">
+        <label
+          for="phone"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >Phone</label
+        >
+        <input
+          type="tel"
+          name="phone"
+          {% if user.phone|int != -1 %}
+            value="{{ user.phone }}"
+          {% else %}
+            value=""
+          {% endif %}
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+          required
+        />
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#email"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#college"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
 
-    <div>
-        <label for="college">College</label>
-        <input type="text" name="college" id="college" value="{{ user.college }}" required>
-    </div>
+      <div
+        class="flex flex-col mb-[10px] h-[100vh] justify-center"
+        id="college"
+      >
+        <label
+          for="college"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >College</label
+        >
+        <input
+          type="text"
+          name="college"
+          id="college"
+          {% if user.college != None %}
+            value="{{ user.college }}"
+          {% else %}
+            value=""
+          {% endif %}
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+          required
+        />
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#phone"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#course"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
 
-    <div>
-        <label for="course">Course</label>
-        <input type="text" name="course" id="course" value="{{ user.course }}" required>
-    </div>
+      <div class="flex flex-col mb-[10px] h-[100vh] justify-center" id="course">
+        <label
+          for="course"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >Course</label
+        >
+        <input
+          type="text"
+          name="course"
+          {% if user.course != None %}
+            value="{{ user.course }}"
+          {% else %}
+            value=""
+          {% endif %}
+          required
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+        />
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#college"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#semester"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
 
-    <div>
-        <label for="semester">Semester</label>
-        <select name="semester" id="semester" required>
-            {% for key, value in user.semester_options %}
-                <option value="{{ key }}">{{ value }}</option>
-            {% endfor %}
+      <div
+        class="flex flex-col mb-[10px] h-[100vh] justify-center"
+        id="semester"
+      >
+        <label
+          for="semester"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >Semester</label
+        >
+        <select
+          name="semester"
+          id="semester"
+          required
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+        >
+          {% for key, value in user.semester_options %}
+            <option value="{{ key }}">{{ value }}</option>
+          {% endfor %}
         </select>
-    </div>
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#course"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#tshirt"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
 
-    <div>
-        <label for="tshirt">Tshirt Size</label>
-        <select name="tshirt" id="tshirt" required>
-            {% for key, value in user.tshirt_options %}
-                <option value="{{ key }}">{{ value }}</option>
-            {% endfor %}
+      <div class="flex flex-col mb-[10px] h-[100vh] justify-center" id="tshirt">
+        <label
+          for="tshirt"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >Tshirt Size</label
+        >
+        <select
+          name="tshirt"
+          id="tshirt"
+          required
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+        >
+          {% for key, value in user.tshirt_options %}
+            <option value="{{ key }}">{{ value }}</option>
+          {% endfor %}
         </select>
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#semester"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#linkedin"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col mb-[10px] h-[100vh] justify-center"
+        id="linkedin"
+      >
+        <label
+          for="linkedin"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >Linkedin</label
+        >
+        <input
+          type="url"
+          name="linkedin"
+          {% if user.linkedin != None %}
+            value="{{ user.linkedin }}"
+          {% else %}
+            value=""
+          {% endif %}
+          required
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+        />
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#tshirt"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#github"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
+
+      <div class="flex flex-col mb-[10px] h-[100vh] justify-center" id="github">
+        <label
+          for="github"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >GitHub</label
+        >
+        <input
+          type="url"
+          name="github"
+          {% if user.github != None %}
+            value="{{ user.github }}"
+          {% else %}
+            value=""
+          {% endif %}
+          required
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+        />
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#linkedin"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#first_hackathon"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col mb-[10px] h-[100vh] justify-center"
+        id="first_hackathon"
+      >
+        <div>
+          <label
+            for="first_hackathon"
+            class="font-semibold mb-[10px] text-white text-[20px]"
+          >Is this your first hackathon ?</label>
+          <input
+            type="checkbox"
+            name="first_hackathon"
+            {% if user.first_hackathon %}
+            checked
+            {% endif %}
+            class="border rounded border-gray-300 py-[7px] px-[15px] ml-[10px]"
+          />
+        </div>
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+          href="#github"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <a
+            href="#experience"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+            >Next</a
+          >
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col mb-[10px] h-[100vh] justify-center"
+        id="experience"
+      >
+        <label
+          for="experience"
+          class="font-semibold mb-[10px] text-white text-[20px]"
+          >Experience</label
+        >
+        <input 
+          type="text" 
+          name="experience" 
+          {% if user.experience != None %}
+            value="{{ user.experience }}"
+          {% else %}
+            value=""
+          {% endif %}
+          class="border rounded border-gray-300 py-[7px] px-[15px]"
+        />
+        <div class="flex items-center justify-end mt-[10px]">
+          <a
+            href="#first_hackathon"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded mr-[10px]"
+            >Previous</a
+          >
+          <input
+            type="submit"
+            value="Update"
+            class="bg-blue-500 text-white font-semibold py-[10px] px-[40px] rounded"
+          />
+        </div>
+      </div>
+
+      <input type="submit" value="Update" />
+    </form>
+    <div class="fixed top-0 h-full w-full left-0 -z-10">
+      <img
+        src="https://makeaton.in/assets/images/hero_bg.png"
+        alt="."
+        class="h-full w-full object-cover object-center"
+      />
     </div>
+    <div class="fixed top-0 left-0 z-[-1] bg-[#0000009d] h-full w-full"></div>
+    <script>
+        console.log("HERE")
+        e.preventDefault();
+        const sections = document.getElementsByClassName("flex flex-col mb-[10px] h-[100vh] justify-center")
 
-    <div>
-        <label for="linkedin">Linkedin</label>
-        <input type="url" name="linkedin" id="linkedin" value="{{ user.linkedin }}" required>
-    </div>
+        for ( let i = 0; i < sections.length; i++) {
+          if (sections[i].children[1].nodeName == "INPUT") {
+            console.log(sections[i].children[1].value)
+          }
+      }
+      
+    </script>
+    <!-- <script>
+      const first_hackathon = document.getElementById("first_hackathon");
+      const experience = document.getElementById("experience_container");
 
-    <div>
-        <label for="github">GitHub</label>
-        <input type="url" name="github" id="github" value="{{ user.github }}" required>
-    </div>
-
-    <div>
-        <label for="first_hackathon">Is this your first hackathon ?</label>
-        <input type="checkbox" name="first_hackathon" id="first_hackathon"
-               {% if user.first_hackathon %} checked {% endif %}>
-    </div>
-
-    <div {% if user.first_hackathon %} hidden {% endif %} id="experience_container">
-        <label for="experience">Experience</label>
-        <input type="text" name="experience" id="experience"
-               {% if user.first_hackathon %} value="{{ user.experience }} {% endif %}">
-    </div>
-
-    <input type="submit" value="Update">
-
-</form>
-<script>
-    const first_hackathon = document.getElementById("first_hackathon");
-    const experience = document.getElementById("experience_container");
-
-    first_hackathon.addEventListener("change", () => experience.hidden = first_hackathon.checked);
-</script>
-</body>
+      first_hackathon.addEventListener(
+        "change",
+        () => (experience.hidden = first_hackathon.checked)
+      );
+    </script> -->
+  </body>
 </html>

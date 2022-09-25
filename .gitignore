@@ -1,6 +1,11 @@
 .config
 venv
+env
 .idea
 .env
 *.db
 google_client_secret.json
+
+node_modules
+
+__pycache__
