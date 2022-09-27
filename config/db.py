@@ -1,5 +1,6 @@
 from typing import Generator
 
+from sqlalchemy import types
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, Session, as_declarative, declared_attr
 
@@ -46,3 +47,14 @@ class Base:
     @declared_attr
     def __tablename__(self) -> str:
         return self.__name__.lower()
+
+
+class TruncatedString(types.TypeDecorator):
+    impl = types.String
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        return value[:self.impl.length]
+
+    def copy(self, **kwargs):
+        return TruncatedString(self.impl.length)

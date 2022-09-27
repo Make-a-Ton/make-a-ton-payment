@@ -67,16 +67,16 @@ async def create_team(user: User = Depends(get_current_user), db: AsyncSession =
     members = set([str(m).lower().strip() for m in (member1, member2, member3) if m is not None and m != user.email])
 
     if len(members) > 3:
-        return RedirectResponse("?error=Team can have only 4 members", status_code=307)
+        return RedirectResponse("/?error=Team can have only 4 members", status_code=307)
 
     if len(members) < 2:
-        return RedirectResponse("?error=Team should have at least 3 members", status_code=307)
+        return RedirectResponse("/?error=Team should have at least 3 members", status_code=307)
 
     members = {await get_user_by_email(u, db) or await create_user(u, "", -1, "", db) for u in members}
 
     for member in members:
         if member.team_id:
-            return RedirectResponse(f"?error={member.email} already in a team", status_code=307)
+            return RedirectResponse(f"/?error={member.email} already in a team", status_code=307)
 
     team = Team(name=name, lead=user.id, members=[m.id for m in members])
     db.add(team)
@@ -179,7 +179,7 @@ async def delete_team(request: Request, user: User = Depends(get_current_user), 
 
 
 @router.get("/")
-def home(request: Request, user: User = Depends(get_current_user)):
+def home(request: Request, user: User = Depends(get_current_user), error=""):
     if not user:
         return login_redirect("/")
 
@@ -193,7 +193,8 @@ def home(request: Request, user: User = Depends(get_current_user)):
         return RedirectResponse("/registered", status_code=303)
 
     context = {
-        "request": request
+        "request": request,
+        "error": error
     }
 
     return templates.TemplateResponse("team.html", context=context)

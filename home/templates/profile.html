@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="/static/home/profile.css" />
     <link rel="stylesheet" href="/static/css/app.css" />
 
     <title>{{ app }}</title>
@@ -30,6 +29,7 @@
         >
         <input
           type="text"
+          id="name"
           value="{{ user.name }}"
           readonly
           class="border rounded border-gray-300 py-[7px] px-[15px]"
@@ -51,6 +51,7 @@
         >
         <input
           type="email"
+          id="email"
           value="{{ user.email }}"
           readonly
           class="border rounded border-gray-300 py-[7px] px-[15px]"
@@ -78,6 +79,7 @@
         <input
           type="tel"
           name="phone"
+          id="phone"
           {% if user.phone|int != -1 %}
             value="{{ user.phone }}"
           {% else %}
@@ -144,6 +146,7 @@
         <input
           type="text"
           name="course"
+          id="course"
           {% if user.course != None %}
             value="{{ user.course }}"
           {% else %}
@@ -182,7 +185,7 @@
           class="border rounded border-gray-300 py-[7px] px-[15px]"
         >
           {% for key, value in user.semester_options %}
-            <option value="{{ key }}">{{ value }}</option>
+            <option value="{{ key }}" {% if user.semester == key %}selected{% endif %}>{{ value }}</option>
           {% endfor %}
         </select>
         <div class="flex items-center justify-end mt-[10px]">
@@ -212,7 +215,7 @@
           class="border rounded border-gray-300 py-[7px] px-[15px]"
         >
           {% for key, value in user.tshirt_options %}
-            <option value="{{ key }}">{{ value }}</option>
+            <option value="{{ key }}" {% if user.tshirt == key %}selected{% endif %}>{{ value }}</option>
           {% endfor %}
         </select>
         <div class="flex items-center justify-end mt-[10px]">
@@ -241,6 +244,7 @@
         <input
           type="url"
           name="linkedin"
+          id="linkedin"
           {% if user.linkedin != None %}
             value="{{ user.linkedin }}"
           {% else %}
@@ -272,6 +276,7 @@
         <input
           type="url"
           name="github"
+          id="github"
           {% if user.github != None %}
             value="{{ user.github }}"
           {% else %}
@@ -306,6 +311,7 @@
           <input
             type="checkbox"
             name="first_hackathon"
+            id="first_hackathon"
             {% if user.first_hackathon %}
             checked
             {% endif %}
@@ -338,6 +344,7 @@
         <input 
           type="text" 
           name="experience" 
+          id="experience"
           {% if user.experience != None %}
             value="{{ user.experience }}"
           {% else %}
@@ -369,26 +376,5 @@
       />
     </div>
     <div class="fixed top-0 left-0 z-[-1] bg-[#0000009d] h-full w-full"></div>
-    <script>
-        console.log("HERE")
-        e.preventDefault();
-        const sections = document.getElementsByClassName("flex flex-col mb-[10px] h-[100vh] justify-center")
-
-        for ( let i = 0; i < sections.length; i++) {
-          if (sections[i].children[1].nodeName == "INPUT") {
-            console.log(sections[i].children[1].value)
-          }
-      }
-      
-    </script>
-    <!-- <script>
-      const first_hackathon = document.getElementById("first_hackathon");
-      const experience = document.getElementById("experience_container");
-
-      first_hackathon.addEventListener(
-        "change",
-        () => (experience.hidden = first_hackathon.checked)
-      );
-    </script> -->
   </body>
 </html>
