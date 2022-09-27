@@ -112,7 +112,7 @@ async def create_team(request: Request, team_id: int, user: User = Depends(get_c
         context["error"] = "Invalid team ID"
         return templates.TemplateResponse("join.html", status_code=400, context=context)
 
-    if user.id in team.members:
+    if user.id not in team.members:
         context["error"] = "Sorry you are not invited"
         return templates.TemplateResponse("join.html", status_code=400, context=context)
 
