@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/static/css/app.css" />
+
+    <title>Join</title>
+
+    <style></style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-[#001d47] via-[#4d0043] to-[#001d58] flex items-center justify-center min-h-screen py-[100px] px-[32px]"
+  >
+    <div class="bg-white py-[60px] px-[40px] rounded shadow">
+      <h1 class="text-center text-[20px] font-semibold mb-[20px]">
+        {% if error %}{{ error }}{% else %}Team Joined{% endif %}
+      </h1>
+    <div class="!w-full">
+        <a href="{% if user.team_id %}/registered{% else %}/{% endif %}">Go Back</a>
+    </div>
+    </div>
+  </body>
+</html>

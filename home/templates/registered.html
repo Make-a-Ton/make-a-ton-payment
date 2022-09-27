@@ -24,7 +24,7 @@
               <tr>
                 <td class="border border-gray-200 px-[10px] py-[7px]">{{ member.email }}</td>
                 <td class="border border-gray-200 px-[10px] py-[7px]">
-                  {% if member.name %}
+                  {% if member.team_id == team_id %}
                     Invitation Accepted
                   {% else %}
                     Invitation Pending
@@ -34,6 +34,7 @@
             {% endfor %}
           </table>
         {% endif %}
+        <a href="/team/join?team_id={{ team_id }}" class="m-[10px]">Team Invite Link</a>
         {% if lead.email == current_user.email %}
           <a href="/team/delete" class="py-[10px] px-[20px] mt-[20px] block text-center bg-red-500 text-white font-semibold w-full max-w-[500px] mx-auto rounded">
             <button class="button">Delete Team</button>

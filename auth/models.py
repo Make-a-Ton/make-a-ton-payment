@@ -35,4 +35,3 @@ class User(Base):
 
     team_id = Column(Integer, ForeignKey("team.id", ondelete='SET NULL'), nullable=True, default=None,
                      server_default=None)
-    team_accepted = Column(Boolean, nullable=True, default=False)

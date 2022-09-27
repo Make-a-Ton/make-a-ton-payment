@@ -64,44 +64,66 @@ async def create_team(user: User = Depends(get_current_user), db: AsyncSession =
     if not user:
         return login_redirect("/")
 
-    members = set([str(m).lower().strip() for m in (member1, member2, member3) if m is not None])
+    members = set([str(m).lower().strip() for m in (member1, member2, member3) if m is not None and m != user.email])
 
     if len(members) > 3:
-        return RedirectResponse("/?error='Team can have only 4 members'", status_code=307)
+        return RedirectResponse("?error=Team can have only 4 members", status_code=307)
 
-    team = Team(name=name, lead=user.id)
+    if len(members) < 2:
+        return RedirectResponse("?error=Team should have at least 3 members", status_code=307)
 
-    db.add(team)
-    await db.commit()
-
-    await db.refresh(team)
-
-    member_ids = []
-    invalid = set()
+    members = {await get_user_by_email(u, db) or await create_user(u, "", -1, "", db) for u in members}
 
     for member in members:
-        user_m = await get_user_by_email(member, db) or await create_user(member, "", -1, "", db)
+        if member.team_id:
+            return RedirectResponse(f"?error={member.email} already in a team", status_code=307)
 
-        if user_m.team_id and user_m.team_accepted:
-            invalid.add(member)
-            continue
+    team = Team(name=name, lead=user.id, members=[m.id for m in members])
+    db.add(team)
 
-        change = update(User).where(User.id == user_m.id).values(team_id=team.id, team_accepted=False)
-        member_ids.append(user_m.id)
+    await db.commit()
+    await db.refresh(team)
 
-        await db.execute(change)
-
-    change = update(Team).where(Team.id == team.id).values(members=member_ids)
-    await db.execute(change)
-
-    change = update(User).where(User.id == user.id).values(team_id=team.id, team_accepted=True)
+    change = update(User).where(User.id == user.id).values(team_id=team.id)
     await db.execute(change)
 
     await db.commit()
 
-    send_mails(members-invalid, name, user.name)
+    await send_mails(members, name, user.name, team.id)
 
     return RedirectResponse("/registered", status_code=303)
+
+
+@router.get("/team/join")
+async def create_team(request: Request, team_id: int, user: User = Depends(get_current_user),
+                      db: AsyncSession = Depends(get_db)):
+    if not user:
+        return login_redirect(f"/team/join?team_id={team_id}")
+
+    context = {"request": request, "user": user}
+
+    if user.team_id:
+        context["error"] = "You are already in a team"
+        return templates.TemplateResponse("join.html", status_code=400, context=context)
+
+    team = await db.get(Team, team_id)
+
+    if team is None:
+        context["error"] = "Invalid team ID"
+        return templates.TemplateResponse("join.html", status_code=400, context=context)
+
+    if user.id in team.members:
+        context["error"] = "Sorry you are not invited"
+        return templates.TemplateResponse("join.html", status_code=400, context=context)
+
+    user.team_id = team.id
+
+    change = update(User).where(User.id == user.id).values(team_id=team.id)
+    await db.execute(change)
+
+    await db.commit()
+
+    return templates.TemplateResponse("join.html", status_code=200, context=context)
 
 
 @router.get("/registered")
@@ -112,20 +134,16 @@ async def registered(request: Request, user: User = Depends(get_current_user), d
     if not user.team_id:
         RedirectResponse("/", status_code=307)
 
-    user.team_accepted = True
-
-    change = update(User).where(User.id == user.id).values(team_accepted=True)
-    await db.execute(change)
-
     team = await db.get(Team, user.team_id)
 
-    lead = await db.get(User, team.lead)
+    lead = user if team.lead == user.id else await db.get(User, team.lead)
     members = [user if m == user.id else await db.get(User, m) for m in team.members if m != lead.id]
 
     context = {
         "app": config["name"],
         "request": request,
         "name": team.name,
+        "team_id": team.id,
         "lead": lead,
         "members": members,
         "current_user": user
@@ -167,8 +185,8 @@ def home(request: Request, user: User = Depends(get_current_user)):
 
     if not (user.college and user.github and
             user.linkedin and user.course and
-            user.tshirt and user.semester and user.phone != -1 and
-             user.experience != None):
+            user.tshirt and user.semester and user.phone != -1) or \
+            (not user.first_hackathon and user.experience is None):
         return RedirectResponse("/profile", status_code=307)
 
     if user.team_id:
